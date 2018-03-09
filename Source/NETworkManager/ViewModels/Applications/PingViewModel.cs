@@ -13,6 +13,10 @@ using NETworkManager.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Threading;
+using System.Windows.Data;
+using Dragablz;
+using NETworkManager.Controls;
+using System.Threading.Tasks;
 
 namespace NETworkManager.ViewModels.Applications
 {
@@ -21,40 +25,31 @@ namespace NETworkManager.ViewModels.Applications
         #region Variables
         CancellationTokenSource cancellationTokenSource;
 
+        private int _tabId;
+
         DispatcherTimer dispatcherTimer = new DispatcherTimer();
         Stopwatch stopwatch = new Stopwatch();
 
         private bool _isLoading = true;
 
-        private string _hostnameOrIPAddress;
-        public string HostnameOrIPAddress
+        private string _host;
+        public string Host
         {
-            get { return _hostnameOrIPAddress; }
+            get { return _host; }
             set
             {
-                if (value == _hostnameOrIPAddress)
+                if (value == _host)
                     return;
 
-                _hostnameOrIPAddress = value;
+                _host = value;
                 OnPropertyChanged();
             }
         }
 
-        private List<string> _hostnameOrIPAddressHistory = new List<string>();
-        public List<string> HostnameOrIPAddressHistory
+        private ICollectionView _hostHistoryView;
+        public ICollectionView HostHistoryView
         {
-            get { return _hostnameOrIPAddressHistory; }
-            set
-            {
-                if (value == _hostnameOrIPAddressHistory)
-                    return;
-
-                if (!_isLoading)
-                    SettingsManager.Current.Ping_HostnameOrIPAddressHistory = value;
-
-                _hostnameOrIPAddressHistory = value;
-                OnPropertyChanged();
-            }
+            get { return _hostHistoryView; }
         }
 
         private bool _isPingRunning;
@@ -270,21 +265,20 @@ namespace NETworkManager.ViewModels.Applications
         }
         #endregion
 
-        #region Contructor
-        public PingViewModel()
-        {         
+        #region Contructor, load settings    
+        public PingViewModel(int tabId)
+        {
+            _tabId = tabId;
+
+            _hostHistoryView = CollectionViewSource.GetDefaultView(SettingsManager.Current.Ping_HostHistory);
+
             LoadSettings();
 
             _isLoading = false;
         }
-        #endregion
 
-        #region Load settings
         private void LoadSettings()
         {
-            if (SettingsManager.Current.Ping_HostnameOrIPAddressHistory != null)
-                HostnameOrIPAddressHistory = new List<string>(SettingsManager.Current.Ping_HostnameOrIPAddressHistory);
-
             ExpandStatistics = SettingsManager.Current.Ping_ExpandStatistics;
         }
         #endregion
@@ -327,15 +321,26 @@ namespace NETworkManager.ViewModels.Applications
             MinimumTime = 0;
             MaximumTime = 0;
 
+            // Change the tab title (not nice, but it works)
+            Window window = Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
+
+            if (window != null)
+            {
+                foreach (TabablzControl tabablzControl in VisualTreeHelper.FindVisualChildren<TabablzControl>(window))
+                {
+                    tabablzControl.Items.OfType<DragablzPingTabItem>().First(x => x.ID == _tabId).Header = Host;
+                }
+            }
+
             // Try to parse the string into an IP-Address
-            IPAddress.TryParse(HostnameOrIPAddress, out IPAddress ipAddress);
+            IPAddress.TryParse(Host, out IPAddress ipAddress);
 
             try
             {
                 // Try to resolve the hostname
                 if (ipAddress == null)
                 {
-                    IPHostEntry ipHostEntrys = await Dns.GetHostEntryAsync(HostnameOrIPAddress);
+                    IPHostEntry ipHostEntrys = await Dns.GetHostEntryAsync(Host);
 
                     foreach (IPAddress ip in ipHostEntrys.AddressList)
                     {
@@ -366,14 +371,14 @@ namespace NETworkManager.ViewModels.Applications
             {
                 PingFinished();
 
-                StatusMessage = string.Format(Application.Current.Resources["String_CouldNotResolveHostnameFor"] as string, HostnameOrIPAddress);
+                StatusMessage = string.Format(Application.Current.Resources["String_CouldNotResolveHostnameFor"] as string, Host);
                 DisplayStatusMessage = true;
 
                 return;
             }
 
             // Add the hostname or ip address to the history
-            HostnameOrIPAddressHistory = new List<string>(HistoryListHelper.Modify(HostnameOrIPAddressHistory, HostnameOrIPAddress, SettingsManager.Current.General_HistoryListEntries));
+            AddHostToHistory(Host);
 
             cancellationTokenSource = new CancellationTokenSource();
 
@@ -416,6 +421,19 @@ namespace NETworkManager.ViewModels.Applications
             EndTime = DateTime.Now;
 
             stopwatch.Reset();
+        }
+
+        private void AddHostToHistory(string host)
+        {
+            // Create the new list
+            List<string> list = ListHelper.Modify(SettingsManager.Current.Ping_HostHistory.ToList(), host, SettingsManager.Current.General_HistoryListEntries);
+
+            // Clear the old items
+            SettingsManager.Current.Ping_HostHistory.Clear();
+            OnPropertyChanged(nameof(Host)); // Raise property changed again, after the collection has been cleared
+
+            // Fill with the new items
+            list.ForEach(x => SettingsManager.Current.Ping_HostHistory.Add(x));
         }
 
         public void OnShutdown()
@@ -484,11 +502,11 @@ namespace NETworkManager.ViewModels.Applications
                     errorMessage = e.InnerException.Message;
                     break;
             }
-                        
+
             PingFinished();
 
             StatusMessage = errorMessage;
-            DisplayStatusMessage = true;            
+            DisplayStatusMessage = true;
         }
 
         private void Ping_UserHasCanceled(object sender, EventArgs e)

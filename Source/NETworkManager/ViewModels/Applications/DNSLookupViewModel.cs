@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
 using NETworkManager.Collections;
-using System.Net.NetworkInformation;
 using System.Windows.Threading;
 using System.Diagnostics;
 using Heijden.DNS;
@@ -38,21 +37,10 @@ namespace NETworkManager.ViewModels.Applications
             }
         }
 
-        private List<string> _hostHistory = new List<string>();
-        public List<string> HostHistory
+        private ICollectionView _hostHistoryView;
+        public ICollectionView HostHistoryView
         {
-            get { return _hostHistory; }
-            set
-            {
-                if (value == _hostHistory)
-                    return;
-
-                if (!_isLoading)
-                    SettingsManager.Current.DNSLookup_HostHistory = value;
-
-                _hostHistory = value;
-                OnPropertyChanged();
-            }
+            get { return _hostHistoryView; }
         }
 
         public List<QType> Types { get; set; }
@@ -115,7 +103,7 @@ namespace NETworkManager.ViewModels.Applications
             {
                 if (value == _selectedLookupResult)
                     return;
-                
+
                 _selectedLookupResult = value;
                 OnPropertyChanged();
             }
@@ -191,90 +179,6 @@ namespace NETworkManager.ViewModels.Applications
             }
         }
 
-        private string _dnsServerAndPort;
-        public string DNSServerAndPort
-        {
-            get { return _dnsServerAndPort; }
-            set
-            {
-                if (value == _dnsServerAndPort)
-                    return;
-
-                _dnsServerAndPort = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private int _questions;
-        public int Questions
-        {
-            get { return _questions; }
-            set
-            {
-                if (value == _questions)
-                    return;
-
-                _questions = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private int _answers;
-        public int Answers
-        {
-            get { return _answers; }
-            set
-            {
-                if (value == _answers)
-                    return;
-
-                _answers = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private int _authorities;
-        public int Authorities
-        {
-            get { return _authorities; }
-            set
-            {
-                if (value == _authorities)
-                    return;
-
-                _authorities = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private int _additionals;
-        public int Additionals
-        {
-            get { return _additionals; }
-            set
-            {
-                if (value == _additionals)
-                    return;
-
-                _additionals = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private int _messageSize;
-        public int MessageSize
-        {
-            get { return _messageSize; }
-            set
-            {
-                if (value == _messageSize)
-                    return;
-
-                _messageSize = value;
-                OnPropertyChanged();
-            }
-        }
-
         private bool _expandStatistics;
         public bool ExpandStatistics
         {
@@ -296,7 +200,9 @@ namespace NETworkManager.ViewModels.Applications
         #region Contructor, load settings
         public DNSLookupViewModel()
         {
+            _hostHistoryView = CollectionViewSource.GetDefaultView(SettingsManager.Current.DNSLookup_HostHistory);
             _lookupResultView = CollectionViewSource.GetDefaultView(LookupResult);
+            _lookupResultView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(DNSLookupRecordInfo.DNSServer)));
 
             LoadSettings();
 
@@ -305,9 +211,6 @@ namespace NETworkManager.ViewModels.Applications
 
         private void LoadSettings()
         {
-            if (SettingsManager.Current.DNSLookup_HostHistory != null)
-                HostHistory = new List<string>(SettingsManager.Current.DNSLookup_HostHistory);
-
             Types = Enum.GetValues(typeof(QType)).Cast<QType>().OrderBy(x => x.ToString()).ToList();
             Type = Types.First(x => x == SettingsManager.Current.DNSLookup_Type);
 
@@ -382,15 +285,9 @@ namespace NETworkManager.ViewModels.Applications
         private void StartLookup()
         {
             DisplayStatusMessage = false;
-            IsLookupRunning = true;
+            StatusMessage = string.Empty;
 
-            // Reset statistic
-            DNSServerAndPort = string.Empty;
-            Questions = 0;
-            Answers = 0;
-            Authorities = 0;
-            Additionals = 0;
-            MessageSize = 0;
+            IsLookupRunning = true;
 
             // Measure the time
             StartTime = DateTime.Now;
@@ -403,59 +300,41 @@ namespace NETworkManager.ViewModels.Applications
             // Reset the latest results
             LookupResult.Clear();
 
-            HostHistory = new List<string>(HistoryListHelper.Modify(HostHistory, Host, SettingsManager.Current.General_HistoryListEntries));
+            AddHostToHistory(Host);
 
-            DNSLookupOptions DNSLookupOptions = new DNSLookupOptions();
+            DNSLookupOptions dnsLookupOptions = new DNSLookupOptions();
 
             if (SettingsManager.Current.DNSLookup_UseCustomDNSServer)
             {
-                if (!string.IsNullOrEmpty(SettingsManager.Current.DNSLookup_CustomDNSServer))
-                {
-                    DNSLookupOptions.UseCustomDNSServer = SettingsManager.Current.DNSLookup_UseCustomDNSServer;
-                    DNSLookupOptions.CustomDNSServer = SettingsManager.Current.DNSLookup_CustomDNSServer;
-                }
-                else
-                {
-                    StatusMessage = Application.Current.Resources["String_CustomDNSServerIsEmptyCheckYourSettingsUseWindowsOwnDNSServer"] as string;
-                    DisplayStatusMessage = true;
-                }
+                dnsLookupOptions.UseCustomDNSServer = SettingsManager.Current.DNSLookup_UseCustomDNSServer;
+                dnsLookupOptions.CustomDNSServers = SettingsManager.Current.DNSLookup_CustomDNSServer.Select(x => x.Trim()).ToList();
+                dnsLookupOptions.Port = SettingsManager.Current.DNSLookup_Port;
             }
 
-            DNSLookupOptions.Class = SettingsManager.Current.DNSLookup_Class;
-            DNSLookupOptions.Type = Type;
-            DNSLookupOptions.Recursion = SettingsManager.Current.DNSLookup_Recursion;
-            DNSLookupOptions.UseResolverCache = SettingsManager.Current.DNSLookup_UseResolverCache;
-            DNSLookupOptions.TransportType = SettingsManager.Current.DNSLookup_TransportType;
-            DNSLookupOptions.Attempts = SettingsManager.Current.DNSLookup_Attempts;
-            DNSLookupOptions.Timeout = SettingsManager.Current.DNSLookup_Timeout;
-            DNSLookupOptions.ResolveCNAME = SettingsManager.Current.DNSLookup_ResolveCNAME;
+            dnsLookupOptions.AddDNSSuffix = SettingsManager.Current.DNSLookup_AddDNSSuffix;
+
+            if (SettingsManager.Current.DNSLookup_UseCustomDNSSuffix)
+            {
+                dnsLookupOptions.UseCustomDNSSuffix = true;
+                dnsLookupOptions.CustomDNSSuffix = SettingsManager.Current.DNSLookup_CustomDNSSuffix.TrimStart('.');
+            }
+
+            dnsLookupOptions.Class = SettingsManager.Current.DNSLookup_Class;
+            dnsLookupOptions.Type = Type;
+            dnsLookupOptions.Recursion = SettingsManager.Current.DNSLookup_Recursion;
+            dnsLookupOptions.UseResolverCache = SettingsManager.Current.DNSLookup_UseResolverCache;
+            dnsLookupOptions.TransportType = SettingsManager.Current.DNSLookup_TransportType;
+            dnsLookupOptions.Attempts = SettingsManager.Current.DNSLookup_Attempts;
+            dnsLookupOptions.Timeout = SettingsManager.Current.DNSLookup_Timeout;
+            dnsLookupOptions.ResolveCNAME = SettingsManager.Current.DNSLookup_ResolveCNAME;
 
             DNSLookup DNSLookup = new DNSLookup();
 
             DNSLookup.RecordReceived += DNSLookup_RecordReceived;
             DNSLookup.LookupError += DNSLookup_LookupError;
-            DNSLookup.LookupComplete += DNSLookup_LookupComplete;
+            DNSLookup.LookupComplete += DNSLookup_LookupComplete; ;
 
-            string hostnameOrIPAddress = Host;
-            string dnsSuffix = string.Empty;
-
-            // Detect hostname (usually they don't contain ".")
-            if (Host.IndexOf(".", StringComparison.OrdinalIgnoreCase) == -1)
-            {
-                if (SettingsManager.Current.DNSLookup_AddDNSSuffix)
-                {
-                    if (SettingsManager.Current.DNSLookup_UseCustomDNSSuffix)
-                        dnsSuffix = SettingsManager.Current.DNSLookup_CustomDNSSuffix;
-                    else
-                        dnsSuffix = IPGlobalProperties.GetIPGlobalProperties().DomainName;
-                }
-            }
-
-            // Append dns suffix to hostname
-            if (!string.IsNullOrEmpty(dnsSuffix))
-                hostnameOrIPAddress += string.Format("{0}{1}", dnsSuffix.StartsWith(".") ? "" : ".", dnsSuffix);
-
-            DNSLookup.LookupAsync(hostnameOrIPAddress, DNSLookupOptions);
+            DNSLookup.LookupAsync(Host.Split(';').Select(x => x.Trim()).ToList(), dnsLookupOptions);
         }
 
         private void LookupFinished()
@@ -471,6 +350,20 @@ namespace NETworkManager.ViewModels.Applications
 
             IsLookupRunning = false;
         }
+
+        // Modify history list
+        private void AddHostToHistory(string host)
+        {
+            // Create the new list
+            List<string> list = ListHelper.Modify(SettingsManager.Current.DNSLookup_HostHistory.ToList(), host, SettingsManager.Current.General_HistoryListEntries);
+
+            // Clear the old items
+            SettingsManager.Current.DNSLookup_HostHistory.Clear();
+            OnPropertyChanged(nameof(Host)); // Raise property changed again, after the collection has been cleared
+
+            // Fill with the new items
+            list.ForEach(x => SettingsManager.Current.DNSLookup_HostHistory.Add(x));
+        }
         #endregion
 
         #region Events
@@ -478,39 +371,29 @@ namespace NETworkManager.ViewModels.Applications
         {
             DNSLookupRecordInfo DNSLookupRecordInfo = DNSLookupRecordInfo.Parse(e);
 
-            Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Send, new Action(delegate ()
-             {
-                 LookupResult.Add(DNSLookupRecordInfo);
-             }));
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Send, new Action(delegate ()
+            {
+                LookupResult.Add(DNSLookupRecordInfo);
+            }));
         }
 
         private void DNSLookup_LookupError(object sender, DNSLookupErrorArgs e)
         {
+            if (!string.IsNullOrEmpty(StatusMessage))
+                StatusMessage += Environment.NewLine;
+
             if (e.ErrorCode == "Timeout Error")
-                StatusMessage = string.Format(Application.Current.Resources["String_TimeoutWhenQueryingDNSServer"] as string, e.DNSServer);
+                StatusMessage += string.Format(Application.Current.Resources["String_TimeoutWhenQueryingDNSServer"] as string, e.DNSServer);
             else
-                StatusMessage = Application.Current.Resources["String_UnkownError"] as string;
+                StatusMessage += Application.Current.Resources["String_UnkownError"] as string;
 
             DisplayStatusMessage = true;
 
             LookupFinished();
         }
 
-        private void DNSLookup_LookupComplete(object sender, DNSLookupCompleteArgs e)
+        private void DNSLookup_LookupComplete(object sender, EventArgs e)
         {
-            DNSServerAndPort = e.ServerAndPort;
-            Questions = e.QuestionsCount;
-            Answers = e.AnswersCount;
-            Authorities = e.AuthoritiesCount;
-            Additionals = e.AdditionalsCount;
-            MessageSize = e.MessageSize;
-
-            if (e.AnswersCount == 0)
-            {
-                StatusMessage = string.Format(Application.Current.Resources["String_NoDNSRecordFoundCheckYourInputAndSettings"] as string, Host);
-                DisplayStatusMessage = true;
-            }
-
             LookupFinished();
         }
 

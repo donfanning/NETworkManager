@@ -3,6 +3,10 @@ using System.Windows.Input;
 using System.Diagnostics;
 using System.Windows;
 using NETworkManager.Models.Update;
+using System;
+using System.ComponentModel;
+using NETworkManager.Models.Documentation;
+using System.Windows.Data;
 
 namespace NETworkManager.ViewModels.Settings
 {
@@ -94,16 +98,50 @@ namespace NETworkManager.ViewModels.Settings
             }
         }
 
-        private bool _noUpdateAvailable;
-        public bool NoUpdateAvailable
+        private bool _showUpdaterMessage;
+        public bool ShowUpdaterMessage
         {
-            get { return _noUpdateAvailable; }
+            get { return _showUpdaterMessage; }
             set
             {
-                if (value == _noUpdateAvailable)
+                if (value == _showUpdaterMessage)
                     return;
 
-                _noUpdateAvailable = value;
+                _showUpdaterMessage = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _updaterMessage;
+        public string UpdaterMessage
+        {
+            get { return _updaterMessage; }
+            set
+            {
+                if (value == _updaterMessage)
+                    return;
+
+                _updaterMessage = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ICollectionView _librariesView;
+        public ICollectionView LibrariesView
+        {
+            get { return _librariesView; }
+        }
+
+        private LibraryInfo _selectedLibraryInfo;
+        public LibraryInfo SelectedLibraryInfo
+        {
+            get { return _selectedLibraryInfo; }
+            set
+            {
+                if (value == _selectedLibraryInfo)
+                    return;
+
+                _selectedLibraryInfo = value;
                 OnPropertyChanged();
             }
         }
@@ -114,6 +152,9 @@ namespace NETworkManager.ViewModels.Settings
         {
             Version = string.Format("{0} {1}", Application.Current.Resources["String_Version"] as string, AssemblyManager.Current.Version);
             CopyrightAndAuthor = string.Format("{0} {1}.", AssemblyManager.Current.Copyright, AssemblyManager.Current.Company);
+
+            _librariesView = CollectionViewSource.GetDefaultView(LibraryManager.List);
+            _librariesView.SortDescriptions.Add(new SortDescription(nameof(LibraryInfo.Library), ListSortDirection.Ascending));
         }
         #endregion
 
@@ -137,13 +178,33 @@ namespace NETworkManager.ViewModels.Settings
         {
             Process.Start((string)url);
         }
+
+        public ICommand OpenLibaryWebsiteCommand
+        {
+            get { return new RelayCommand(p => OpenLibaryWebsiteAction()); }
+        }
+
+        private void OpenLibaryWebsiteAction()
+        {
+            Process.Start(SelectedLibraryInfo.LibraryUrl);
+        }
+
+        public ICommand OpenLibaryLicenseCommand
+        {
+            get { return new RelayCommand(p => OpenLibaryLicenseAction()); }
+        }
+
+        private void OpenLibaryLicenseAction()
+        {
+            Process.Start(SelectedLibraryInfo.LicenseUrl);
+        }
         #endregion
 
         #region Methods
         private void CheckForUpdates()
         {
             UpdateAvailable = false;
-            NoUpdateAvailable = false;
+            ShowUpdaterMessage = false;
 
             IsUpdateCheckRunning = true;
 
@@ -151,6 +212,7 @@ namespace NETworkManager.ViewModels.Settings
 
             updater.UpdateAvailable += Updater_UpdateAvailable;
             updater.NoUpdateAvailable += Updater_NoUpdateAvailable;
+            updater.Error += Updater_Error;
 
             updater.Check();
         }
@@ -162,13 +224,23 @@ namespace NETworkManager.ViewModels.Settings
             UpdateText = string.Format(Application.Current.Resources["String_VersionxxAvailable"] as string, e.Version);
 
             IsUpdateCheckRunning = false;
-            UpdateAvailable = true;            
+            UpdateAvailable = true;
         }
 
         private void Updater_NoUpdateAvailable(object sender, System.EventArgs e)
         {
+            UpdaterMessage = Application.Current.Resources["String_NoUpdateAvailable"] as string;
+
             IsUpdateCheckRunning = false;
-            NoUpdateAvailable = true;
+            ShowUpdaterMessage = true;
+        }
+
+        private void Updater_Error(object sender, EventArgs e)
+        {
+            UpdaterMessage = Application.Current.Resources["String_ErrorCheckingApiGithubComVerifyYourNetworkConnection"] as string; ;
+
+            IsUpdateCheckRunning = false;
+            ShowUpdaterMessage = true;
         }
         #endregion
     }

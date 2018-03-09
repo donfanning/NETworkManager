@@ -39,7 +39,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" Text="{DynamicResource String_URL}" Style="{DynamicResource DefaultTextBlock}" VerticalAlignment="Center" />
-                    <ComboBox Grid.Column="2" x:Name="cbWebsiteUri" ItemsSource="{Binding WebsiteUriHistory}" mah:TextBoxHelper.Watermark="{DynamicResource String_Watermark_ExampleWebsiteUri}" Validation.ErrorTemplate="{StaticResource DefaultErrorTemplate}" IsEnabled="{Binding IsCheckRunning, Converter={StaticResource BooleanReverseConverter}}" Style="{StaticResource HistoryComboBox}">
+                    <ComboBox Grid.Column="2" x:Name="cbWebsiteUri" ItemsSource="{Binding WebsiteUriHistoryView}" mah:TextBoxHelper.Watermark="{DynamicResource String_Watermark_ExampleWebsiteUri}" Validation.ErrorTemplate="{StaticResource DefaultErrorTemplate}" IsEnabled="{Binding IsCheckRunning, Converter={StaticResource BooleanReverseConverter}}" Style="{StaticResource HistoryComboBox}">
                         <ComboBox.Text>
                             <Binding Path="WebsiteUri" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                 <Binding.ValidationRules>
@@ -99,8 +99,8 @@
                 <TextBlock Grid.Row="2" Foreground="{DynamicResource AccentColorBrush}" Text="{Binding StatusMessage}" Visibility="{Binding DisplayStatusMessage, Converter={StaticResource BooleanToVisibilityConverter}}" Style="{DynamicResource DefaultTextBlock}" Margin="0,10,0,0" />
             </Grid>
             <TextBlock Grid.Row="2" Style="{StaticResource HeaderTextBlock}" Text="{DynamicResource String_Header_Headers}" />
-            <TextBox Grid.Row="3" Text="{Binding Headers}" Style="{StaticResource DefaultTextBox}" FontFamily="Consolas" IsReadOnly="True" ContextMenu="{StaticResource CopyContextMenu}" Margin="0,0,0,20"/>
-            <Expander Grid.Row="4" IsExpanded="{Binding ExpandStatistics}" Style="{StaticResource DefaultExpander}">
+            <TextBox Grid.Row="3" Text="{Binding Headers}" Style="{StaticResource ConsoleTextBox}" IsReadOnly="True" ContextMenu="{StaticResource CopyContextMenu}" Margin="0,0,0,20"/>
+            <Expander Grid.Row="4" IsExpanded="{Binding ExpandStatistics}" Style="{StaticResource HeaderExpander}">
                 <Expander.Header>
                     <TextBlock Text="{DynamicResource String_Header_Statistics}" Style="{StaticResource HeaderTextBlock}" Margin="0" />
                 </Expander.Header>

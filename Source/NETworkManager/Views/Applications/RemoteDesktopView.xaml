@@ -8,7 +8,7 @@
         xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
         xmlns:Converter="clr-namespace:NETworkManager.Converters"
         xmlns:Settings="clr-namespace:NETworkManager.Models.Settings"
-        xmlns:Resources="clr-namespace:NETworkManager.Properties"
+        xmlns:Documentation="clr-namespace:NETworkManager.Models.Documentation"
         Dialog:DialogParticipation.Register="{Binding}"
         mc:Ignorable="d">
     <UserControl.Resources>
@@ -16,6 +16,9 @@
         <Converter:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <Converter:NullOrEmptyToBoolConverter x:Key="NullOrEmptyToBoolConverter" />
     </UserControl.Resources>
+    <UserControl.InputBindings>
+        <KeyBinding Key="T" Modifiers="Ctrl" Command="{Binding ConnectNewSessionCommand}" />
+    </UserControl.InputBindings>
     <Grid>
         <Grid Visibility="{Binding IsRDP8dot1Available, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.ColumnDefinitions>
@@ -24,7 +27,7 @@
             </Grid.ColumnDefinitions>
             <dragablz:TabablzControl Grid.Column="0" Grid.Row="0" Margin="-0,-2,0,0" ItemsSource="{Binding TabItems}" SelectedIndex="{Binding SelectedTabIndex}">
                 <dragablz:TabablzControl.InterTabController>
-                    <dragablz:InterTabController InterTabClient="{Binding InterTabClient}" />
+                    <dragablz:InterTabController InterTabClient="{Binding InterTabClient}" Partition="3D21565B-3E97-42F1-B0B9-CCA7DA63EFB2"/>
                 </dragablz:TabablzControl.InterTabController>
                 <dragablz:TabablzControl.Style>
                     <Style TargetType="{x:Type dragablz:TabablzControl}" BasedOn="{StaticResource DefaultTabablzControl}">
@@ -54,7 +57,7 @@
                         <Setter Property="ContentTemplate">
                             <Setter.Value>
                                 <DataTemplate>
-                                    <ContentPresenter Content="{Binding Control}" Visibility="{Binding Source={x:Static Settings:ConfigurationManager.Current}, Path=FixAirspace, Converter={StaticResource BooleanReverseToVisibilityConverter}}" />
+                                    <ContentPresenter Content="{Binding View}" Visibility="{Binding Source={x:Static Settings:ConfigurationManager.Current}, Path=FixAirspace, Converter={StaticResource BooleanReverseToVisibilityConverter}}" />
                                 </DataTemplate>
                             </Setter.Value>
                         </Setter>
@@ -86,6 +89,15 @@
                                         </MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem Header="{DynamicResource String_ConnectAs}" Command="{Binding ConnectSessionAsCommand}">
+                                        <MenuItem.Icon>
+                                            <Rectangle Width="16" Height="16" Fill="{DynamicResource BlackColorBrush}">
+                                                <Rectangle.OpacityMask>
+                                                    <VisualBrush Stretch="Uniform" Visual="{IconPacks:Octicons Kind=DeviceDesktop}" />
+                                                </Rectangle.OpacityMask>
+                                            </Rectangle>
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem Header="{DynamicResource String_ConnectExternal}" Command="{Binding ConnectSessionExternalCommand}">
                                         <MenuItem.Icon>
                                             <Rectangle Width="16" Height="16" Fill="{DynamicResource BlackColorBrush}">
                                                 <Rectangle.OpacityMask>
@@ -134,9 +146,9 @@
                                             <Setter Property="Template">
                                                 <Setter.Value>
                                                     <ControlTemplate>
-                                                        <Expander IsExpanded="True" Style="{StaticResource DefaultExpander}" Padding="0">
+                                                        <Expander IsExpanded="True" Style="{StaticResource DefaultExpander}">
                                                             <Expander.Header>
-                                                                <TextBlock Text="{Binding Name}" Style="{StaticResource HeaderTextBlock}" FontSize="18" Margin="0" />
+                                                                <TextBlock Text="{Binding Name}" Style="{StaticResource DefaultTextBlock}" />
                                                             </Expander.Header>
                                                             <ItemsPresenter />
                                                         </Expander>
@@ -154,9 +166,9 @@
                                 </Style>
                             </ListBox.ItemContainerStyle>
                         </ListBox>
-                        <TextBlock Grid.Row="2" FontSize="18" Foreground="{DynamicResource GrayBrush3}" VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" Margin="10,0" >
+                        <TextBlock Grid.Row="2">
                             <TextBlock.Style>
-                                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource HeaderTextBlock}">
+                                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MessageTextBlock}">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding RemoteDesktopSessions.Count}" Value="0" >
@@ -193,10 +205,10 @@
             </Border>
         </Grid>
         <StackPanel VerticalAlignment="Center" Visibility="{Binding IsRDP8dot1Available, Converter={StaticResource BooleanReverseToVisibilityConverter}}" Margin="10">
-            <TextBlock FontSize="18" Foreground="{DynamicResource GrayBrush3}" Text="{DynamicResource String_InstallRDP8dot1Message}" TextWrapping="Wrap" TextAlignment="Center" Style="{StaticResource HeaderTextBlock}" Margin="0,0,0,10" />
+            <TextBlock Text="{DynamicResource String_InstallRDP8dot1Message}" Style="{StaticResource MessageTextBlock}" Margin="0,0,0,10" />
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <StackPanel.InputBindings>
-                    <MouseBinding Gesture="LeftClick" Command="{Binding OpenDocumentationCommand}" CommandParameter="00001" />
+                    <MouseBinding Gesture="LeftClick" Command="{x:Static Documentation:DocumentationManager.OpenDocumentationCommand}" CommandParameter="00001" />
                 </StackPanel.InputBindings>
                 <StackPanel.Style>
                     <Style TargetType="{x:Type StackPanel}">

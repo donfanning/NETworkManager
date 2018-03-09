@@ -54,9 +54,9 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Column="0" Grid.Row="0" Text="{DynamicResource String_Host}" Style="{StaticResource CenterTextBlock}" />
-                        <ComboBox Grid.Column="2" Grid.Row="0" x:Name="cbHostname" Height="{Binding ElementName=cbPorts, Path=ActualHeight}" ItemsSource="{Binding HostnameHistory}" mah:TextBoxHelper.Watermark="{DynamicResource String_Watermark_ExampleHostnameAndOrIPAddress}" IsEnabled="{Binding IsScanRunning, Converter={StaticResource BooleanReverseConverter}}" Style="{StaticResource HistoryComboBox}">
+                        <ComboBox Grid.Column="2" Grid.Row="0" x:Name="cbHost" Height="{Binding ElementName=cbPort, Path=ActualHeight}" ItemsSource="{Binding HostHistoryView}" mah:TextBoxHelper.Watermark="{DynamicResource String_Watermark_ExampleHostnameAndOrIPAddress}" IsEnabled="{Binding IsScanRunning, Converter={StaticResource BooleanReverseConverter}}" Style="{StaticResource HistoryComboBox}">
                             <ComboBox.Text>
-                                <Binding Path="Hostname" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                <Binding Path="Host" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
                                         <Validator:EmptyValidator ValidatesOnTargetUpdated="True" />
                                         <Validator:MultipleHostsValidator ValidatesOnTargetUpdated="True" />
@@ -65,9 +65,9 @@
                             </ComboBox.Text>
                         </ComboBox>
                         <TextBlock Grid.Column="0" Grid.Row="2" Text="{DynamicResource String_Ports}" Style="{StaticResource CenterTextBlock}" />
-                        <ComboBox Grid.Column="2" Grid.Row="2" x:Name="cbPorts" ItemsSource="{Binding PortsHistory}" mah:TextBoxHelper.Watermark="{DynamicResource String_Watermark_ExamplePortScanRange}" IsEnabled="{Binding IsScanRunning, Converter={StaticResource BooleanReverseConverter}}" Style="{StaticResource HistoryComboBox}">
+                        <ComboBox Grid.Column="2" Grid.Row="2" x:Name="cbPort" ItemsSource="{Binding PortHistoryView}" mah:TextBoxHelper.Watermark="{DynamicResource String_Watermark_ExamplePortScanRange}" IsEnabled="{Binding IsScanRunning, Converter={StaticResource BooleanReverseConverter}}" Style="{StaticResource HistoryComboBox}">
                             <ComboBox.Text>
-                                <Binding Path="Ports" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                <Binding Path="Port" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
                                         <Validator:EmptyValidator ValidatesOnTargetUpdated="True" />
                                         <Validator:PortRangeValidator ValidatesOnTargetUpdated="True" />
@@ -80,10 +80,10 @@
                                 <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ImageWithTextButton}">
                                     <Setter Property="IsEnabled" Value="True" />
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ElementName=cbHostname, Path=(Validation.HasError)}" Value="True">
+                                        <DataTrigger Binding="{Binding ElementName=cbHost, Path=(Validation.HasError)}" Value="True">
                                             <Setter Property="IsEnabled" Value="False" />
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding ElementName=cbPorts, Path=(Validation.HasError)}" Value="True" >
+                                        <DataTrigger Binding="{Binding ElementName=cbPort, Path=(Validation.HasError)}" Value="True" >
                                             <Setter Property="IsEnabled" Value="False" />
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding CancelScan}" Value="True">
@@ -181,7 +181,7 @@
                 <TextBlock Grid.Row="2" Foreground="{DynamicResource AccentColorBrush}" Text="{Binding StatusMessage}" Visibility="{Binding DisplayStatusMessage, Converter={StaticResource BooleanToVisibilityConverter}}" Style="{DynamicResource DefaultTextBlock}" Margin="0,10,0,0" />
             </Grid>
             <TextBlock Grid.Row="2" Style="{StaticResource HeaderTextBlock}" Text="{DynamicResource String_Header_Result}" />
-            <DataGrid Grid.Row="3" Style="{StaticResource MetroDataGrid}" FontSize="14" mah:ControlsHelper.ContentCharacterCasing="Normal" ItemsSource="{Binding PortScanResultView}" SelectedItem="{Binding SelectedScanResult}" CanUserResizeColumns="False" VerticalScrollBarVisibility="Auto" AutoGenerateColumns="false" IsReadOnly="True" Margin="0,0,0,20">
+            <DataGrid Grid.Row="3" ItemsSource="{Binding PortScanResultView}" SelectedItem="{Binding SelectedScanResult}" Margin="0,0,0,20">
                 <DataGrid.Resources>
                     <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource DataGridScrollBar}" />
                     <WpfHelper:BindingProxy x:Key="BindingProxy" Data="{Binding}" />
@@ -276,10 +276,10 @@
                     <DataGridTextColumn Header="{DynamicResource String_Status}" Binding="{Binding Status, Converter={StaticResource PortStatusToStringConverter}}" MinWidth="100" />
                     <DataGridTextColumn Header="{DynamicResource String_Protocol}" Binding="{Binding LookupInfo.Protocol}" MinWidth="100" />
                     <DataGridTextColumn Header="{DynamicResource String_Service}" Binding="{Binding LookupInfo.Service}" MinWidth="100" />
-                    <DataGridTextColumn Header="{DynamicResource String_Description}" Binding="{Binding LookupInfo.Description}" MinWidth="200" />
+                    <DataGridTextColumn Header="{DynamicResource String_Description}" Binding="{Binding LookupInfo.Description}" MinWidth="200" Width="*" />
                 </DataGrid.Columns>
             </DataGrid>
-            <Expander Grid.Row="4" IsExpanded="{Binding ExpandStatistics}" Style="{StaticResource DefaultExpander}">
+            <Expander Grid.Row="4" IsExpanded="{Binding ExpandStatistics}" Style="{StaticResource HeaderExpander}">
                 <Expander.Header>
                     <TextBlock Text="{DynamicResource String_Header_Statistics}" Style="{StaticResource HeaderTextBlock}" Margin="0" />
                 </Expander.Header>
@@ -390,9 +390,9 @@
                                         <Setter Property="Template">
                                             <Setter.Value>
                                                 <ControlTemplate>
-                                                    <Expander IsExpanded="True" Style="{StaticResource DefaultExpander}" Padding="0">
+                                                    <Expander IsExpanded="True" Style="{StaticResource DefaultExpander}">
                                                         <Expander.Header>
-                                                            <TextBlock Text="{Binding Name}" Style="{StaticResource HeaderTextBlock}" FontSize="18" Margin="0" />
+                                                            <TextBlock Text="{Binding Name}" Style="{StaticResource DefaultTextBlock}" />
                                                         </Expander.Header>
                                                         <ItemsPresenter />
                                                     </Expander>
@@ -409,9 +409,9 @@
                             </Style>
                         </ListBox.ItemContainerStyle>
                     </ListBox>
-                    <TextBlock Grid.Row="2" FontSize="18" Foreground="{DynamicResource GrayBrush3}" VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" Margin="10,0" >
+                    <TextBlock Grid.Row="2">
                         <TextBlock.Style>
-                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource HeaderTextBlock}">
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MessageTextBlock}">
                                 <Setter Property="Visibility" Value="Collapsed" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding PortScannerProfiles.Count}" Value="0" >
@@ -445,7 +445,7 @@
                         <Button.Style>
                             <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ImageWithTextButton}">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=cbPorts, Path=(Validation.HasError)}" Value="True">
+                                    <DataTrigger Binding="{Binding ElementName=cbPort, Path=(Validation.HasError)}" Value="True">
                                         <Setter Property="IsEnabled" Value="False" />
                                     </DataTrigger>
                                 </Style.Triggers>

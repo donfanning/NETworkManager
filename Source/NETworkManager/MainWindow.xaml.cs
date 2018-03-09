@@ -308,14 +308,14 @@ namespace NETworkManager
 
             // Chech for updates...
             if (SettingsManager.Current.Update_CheckForUpdatesAtStartup)
-                CheckForUpdates();                        
+                CheckForUpdates();
         }
 
         private void LoadApplicationList()
         {
             _applications = CollectionViewSource.GetDefaultView(ApplicationViewManager.List);
 
-            Applications.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending)); // Always have the same order, even if it is translated
+            Applications.SortDescriptions.Add(new SortDescription(nameof(ApplicationViewInfo.Name), ListSortDirection.Ascending)); // Always have the same order, even if it is translated
             Applications.Filter = o =>
             {
                 if (string.IsNullOrEmpty(Search))
@@ -404,16 +404,16 @@ namespace NETworkManager
         NetworkInterfaceView networkInterfaceView;
         IPScannerView ipScannerView;
         PortScannerView portScannerView;
-        PingView pingView;
+        PingHostView pingHostView;
         TracerouteView tracerouteView;
         DNSLookupView dnsLookupView;
         RemoteDesktopView remoteDesktopView;
         SNMPView snmpView;
         WakeOnLANView wakeOnLANView;
-        SubnetCalculatorView subnetCalculatorView;
+        SubnetCalculatorHostView subnetCalculatorHostView;
         HTTPHeadersView httpHeadersView;
         ARPTableView arpTableView;
-        LookupView lookupView;
+        LookupHostView lookupHostView;
 
         private ApplicationViewManager.Name? currentApplicationViewName = null;
 
@@ -443,10 +443,10 @@ namespace NETworkManager
                     contentControlApplication.Content = portScannerView;
                     break;
                 case ApplicationViewManager.Name.Ping:
-                    if (pingView == null)
-                        pingView = new PingView();
+                    if (pingHostView == null)
+                        pingHostView = new PingHostView();
 
-                    contentControlApplication.Content = pingView;
+                    contentControlApplication.Content = pingHostView;
                     break;
                 case ApplicationViewManager.Name.Traceroute:
                     if (tracerouteView == null)
@@ -479,10 +479,10 @@ namespace NETworkManager
                     contentControlApplication.Content = wakeOnLANView;
                     break;
                 case ApplicationViewManager.Name.SubnetCalculator:
-                    if (subnetCalculatorView == null)
-                        subnetCalculatorView = new SubnetCalculatorView();
+                    if (subnetCalculatorHostView == null)
+                        subnetCalculatorHostView = new SubnetCalculatorHostView();
 
-                    contentControlApplication.Content = subnetCalculatorView;
+                    contentControlApplication.Content = subnetCalculatorHostView;
                     break;
                 case ApplicationViewManager.Name.HTTPHeaders:
                     if (httpHeadersView == null)
@@ -497,10 +497,10 @@ namespace NETworkManager
                     contentControlApplication.Content = arpTableView;
                     break;
                 case ApplicationViewManager.Name.Lookup:
-                    if (lookupView == null)
-                        lookupView = new LookupView();
+                    if (lookupHostView == null)
+                        lookupHostView = new LookupHostView();
 
-                    contentControlApplication.Content = lookupView;
+                    contentControlApplication.Content = lookupHostView;
                     break;
             }
 
@@ -570,10 +570,15 @@ namespace NETworkManager
             Updater updater = new Updater();
 
             updater.UpdateAvailable += Updater_UpdateAvailable;
-
+            updater.Error += Updater_Error;
             updater.Check();
         }
 
+        private void Updater_Error(object sender, EventArgs e)
+        {
+            //  Log
+        }
+       
         private void Updater_UpdateAvailable(object sender, UpdateAvailableArgs e)
         {
             UpdateText = string.Format(System.Windows.Application.Current.Resources["String_VersionxxAvailable"] as string, e.Version);

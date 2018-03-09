@@ -100,6 +100,9 @@
     <system:String x:Key="String_Header_v1v2c">v1/v2c</system:String>
     <system:String x:Key="String_Header_v3">v3</system:String>
     <system:String x:Key="String_Header_HTTPHeaders">HTTP Headers</system:String>
+    <system:String x:Key="String_Header_Network">Network</system:String>
+    <system:String x:Key="String_Header_Data">Data</system:String>
+    <system:String x:Key="String_Header_IPScanner">IP Scanner</system:String>
     
     <!-- Normal strings -->    
     <system:String x:Key="String_ProductName">NETworkManager</system:String>
@@ -150,7 +153,7 @@
     <system:String x:Key="String_Yes">Yes</system:String>
     <system:String x:Key="String_No">No</system:String>
     <system:String x:Key="String_DNSSuffix">DNS Suffix</system:String>
-    <system:String x:Key="String_DNSServers">DNS Servers</system:String>
+    <system:String x:Key="String_DNSServers">DNS Server(s)</system:String>
     <system:String x:Key="String_DynamicIPv4Address">Dynamic IPv4 Address</system:String>
     <system:String x:Key="String_StaticIPv4Address">Static IPv4 Address</system:String>
     <system:String x:Key="String_StaticIPv4DNSServer">Static IPv4 DNS Server</system:String>
@@ -214,7 +217,7 @@
     <system:String x:Key="String_Service">Service</system:String>
     <system:String x:Key="String_ShowClosedPorts">Show closed ports</system:String>
     <system:String x:Key="String_HostnameOrIPAddress">Hostname or IP address</system:String>
-    <system:String x:Key="String_Ports">Ports</system:String>
+    <system:String x:Key="String_Ports">Port(s)</system:String>
     <system:String x:Key="String_NumberOfStoredEntries">Number of stored entries</system:String>
     <system:String x:Key="String_NetworkLocationCannotBeReached">The network address cannot be reached. Check if your computer is connected to the network. For information about network troubleshooting, see Windows Help.</system:String>
     <system:String x:Key="String_NumberOfErrorsAfterWhichIsCanceled">Number of errors after which is canceled:</system:String>
@@ -236,7 +239,7 @@
     <system:String x:Key="String_NoDNSRecordFoundCheckYourInputAndSettings">No DNS record found for "{0}"! Check your input and the settings.</system:String>
     <system:String x:Key="String_UnkownError">Unkown error!</system:String>
     <system:String x:Key="String_TimeoutWhenQueryingDNSServer">Timeout when querying the DNS server with the IP address "{0}"!</system:String>
-    <system:String x:Key="String_ResolveCNAME">Resolve CNAME</system:String>
+    <system:String x:Key="String_ResolveCNAME">Resolve CNAME on ANY requests</system:String>
     <system:String x:Key="String_Host">Host</system:String>
     <system:String x:Key="String_CouldNotResolveHostnameFor">Could not resolve hostname for: "{0}"</system:String>
     <system:String x:Key="String_NothingToDoCheckYourInput">Nothing to do. Check your input!</system:String>
@@ -246,7 +249,6 @@
     <system:String x:Key="String_TheFollwingParametersCanNotBeProcesses">The following parameters can not be processed:</system:String>
     <system:String x:Key="String_TheFollowingParametersAreAvailable">The following parameters are available:</system:String>
     <system:String x:Key="String_Open">Open</system:String>
-    <system:String x:Key="String_CustomDNSServerIsEmptyCheckYourSettingsUseWindowsOwnDNSServer">Custom DNS server is empty. Check your settings! (Use windows own DNS server...)</system:String>
     <system:String x:Key="String_EnterNameForProfile">Enter a name under which you want to save the profile.</system:String>
     <system:String x:Key="String_DeleteProfileMessage">The selected profile will be deleted permanently.</system:String>
     <system:String x:Key="String_DeleteSessionMessage">The selected session will be deleted permanently.</system:String>
@@ -315,7 +317,7 @@
     <system:String x:Key="String_PasswordsDoesNotMatch">Passwords does not match!</system:String>
     <system:String x:Key="String_WrongPasswordDecryptionFailed">Credentials could not be decrypted with the given password.</system:String>
     <system:String x:Key="String_WrongPassword">The entered password is wrong.</system:String>
-    <system:String x:Key="String_HiddenPassword">************</system:String>
+    <system:String x:Key="String_HiddenPassword">••••••••••••</system:String>
     <system:String x:Key="String_DeleteCredentialMessage">The selected credential will be deleted permanently.</system:String>
     <system:String x:Key="String_DecryptAndLoadCredentialsMessage">Credentials must be decrypted and loaded to manage them.</system:String>
     <system:String x:Key="String_CredentialsEncryptionDisclaimer">The credentials are stored encrypted with AES-256 (Rijndael) in a file. The key for the encryption results from a master password (Rfc2898DeriveBytes). The application uses a SecureString for passwords. For some functions, passwords must be converted from a SecureString to plain text, or vice versa.</system:String>
@@ -340,7 +342,6 @@
     <system:String x:Key="String_OID">OID</system:String>
     <system:String x:Key="String_Community">Community</system:String>
     <system:String x:Key="String_Data">Data</system:String>
-    <system:String x:Key="String_Walk">Walk</system:String>
     <system:String x:Key="String_WalkMode">Walk mode</system:String>
     <system:String x:Key="String_License">License</system:String>
     <system:String x:Key="String_TimeoutOnSNMPQuery">Timeout on SNMP query.</system:String>
@@ -358,10 +359,20 @@
     <system:String x:Key="String_CheckForUpdatesAtStartup">Check for updates at startup</system:String>
     <system:String x:Key="String_NoUpdateAvailable">No update available!</system:String>
     <system:String x:Key="String_InstallRDP8dot1Message">You must install the Remote Desktop Protocol (RDP) version 8.1 on your system to use the Remote Desktop functionality!</system:String>
-    
+    <system:String x:Key="String_TheProcessCanTakeUpSomeTimeAndResources">The process can take up some time and resources (CPU / RAM).</system:String>
+    <system:String x:Key="String_ErrorCheckingApiGithubComVerifyYourNetworkConnection">Error checking 'api.github.com', check your network connection!</system:String>
+    <system:String x:Key="String_Mode">Mode</system:String>
+    <system:String x:Key="String_OpenProject">Open project</system:String>
+    <system:String x:Key="String_OpenLicense">Open license</system:String>
+    <system:String x:Key="String_ConnectExternal">Connect external</system:String>
+    <system:String x:Key="String_DataHasBeenUpdated">Data has been updated!</system:String>
+    <system:String x:Key="String_ErrorInResponseCheckIfYouHaveWritePermissions">Error in response! Check if you have write permissions.</system:String>
+    <system:String x:Key="String_ShowScanResultForAllIPAddresses">Show scan result for all IP addresses</system:String>
+
     <!-- Documentation title -->
-    <system:String x:Key="String_DocumentationTitle_00001">How to install RDP 8.1 on Windows 7/Server 2008 R2?</system:String>
-    
+    <system:String x:Key="String_DocumentationTitle_00001">How to install RDP 8.1 on Windows 7/Server 2008 R2</system:String>
+    <system:String x:Key="String_DocumentationTitle_00002">How to create a custom theme and accent?</system:String>
+
     <!-- Help message -->
     <system:String x:Key="String_HelpMessage_ParameterHelp">Displays this dialog.</system:String>
     <system:String x:Key="String_HelpMessage_ParameterResetSettings">Reset all settings.</system:String>
@@ -371,7 +382,7 @@
     <system:String x:Key="String_HelpMessage_RDPAuthenticationLevel">[0] If server authentication fails, connect to the computer without warning.\n[1] If server authentication fails, do not establish a connection.\n[2] If server authentication fails, show a warning and allow me to connect or refuse the connection.\n[3] No authentication requirement is specified.</system:String>
     
     <!-- Warn message -->
-    <system:String x:Key="String_WarnMessage_SettingsGeneralAppearanceTransparency">Some graphics cards / drivers have problems maximizing the application when transparency is enabled. The function must be disabled for using "Remote Desktop"! Enabling or disabling this feature requires a restart of the application.</system:String>
+    <system:String x:Key="String_WarningMessage_SettingsGeneralAppearanceTransparency">Some graphics cards / drivers have problems maximizing the application when transparency is enabled. The function must be disabled for using "Remote Desktop"! Enabling or disabling this feature requires a restart of the application.</system:String>
     
     <!-- Buttons -->
     <system:String x:Key="String_Button_Change">Change</system:String>
@@ -414,6 +425,7 @@
     <system:String x:Key="String_Button_DecryptAndLoad">Decrypt and load...</system:String>
     <system:String x:Key="String_Button_Query">Query</system:String>
     <system:String x:Key="String_Button_Open">Open</system:String>
+    <system:String x:Key="String_Button_Send">Send</system:String>
     <system:String x:Key="String_Button_CheckForUpdaptes">Check for updates</system:String>
     
     <!-- ContextMenuItem.Header -->
@@ -436,7 +448,9 @@
     <system:String x:Key="String_Watermark_ExampleHostname">SERVER-01</system:String>
     <system:String x:Key="String_Watermark_ExampleIPv4Broadcast">192.168.178.255</system:String>
     <system:String x:Key="String_Watermark_ExamplePort7">7</system:String>
+    <system:String x:Key="String_Watermark_ExamplePort53">53</system:String>
     <system:String x:Key="String_Watermark_ExamplePort161">161</system:String>
+    <system:String x:Key="String_Watermark_ExamplePort3389">3389</system:String>
     <system:String x:Key="String_Watermark_ExampleIPv4Address">192.168.178.55</system:String>
     <system:String x:Key="String_Watermark_ExampleSubnetmask">255.255.255.0</system:String>
     <system:String x:Key="String_Watermark_ExampleHostnameOrIPAddress">SERVER-01 or 172.16.0.100</system:String>
@@ -448,6 +462,7 @@
     <system:String x:Key="String_Watermark_ExampleSubnetmaskOrCIDR">/24 or 255.255.255.0</system:String>
     <system:String x:Key="String_Watermark_ExampleIPv4Gateway">192.168.178.1</system:String>
     <system:String x:Key="String_Watermark_ExampleIPv4DNSServer">8.8.8.8</system:String>
+    <system:String x:Key="String_Watermark_ExampleIPv4DNSServers">192.168.178.1; 8.8.8.8; 8.8.4.4</system:String>
     <system:String x:Key="String_Watermark_ExamplePortPortRangeOrService">22; 80; https; ldaps; 777 - 999; 8080</system:String>
     <system:String x:Key="String_Watermark_ExampleSubnet">192.168.178.133/22 or 192.168.178.133/255.255.252.0</system:String>
     <system:String x:Key="String_Watermark_Filter">Filter...</system:String>
@@ -466,7 +481,7 @@
     <system:String x:Key="String_Watermark_ExampleSuffix">fritz.box</system:String>
     <system:String x:Key="String_Watermark_NotChanged">(not changed)</system:String>
     <system:String x:Key="String_Watermark_ExampleSNMPOID">1.3.6.1.2.1.1</system:String>
-    <system:String x:Key="String_Watermark_ExampleSNMPCommunity">Public</system:String>
+    <system:String x:Key="String_Watermark_ExampleSNMPCommunity">public</system:String>
     <system:String x:Key="String_Watermark_ExampleSNMPUsername">snmp-user</system:String>
     
     <!-- ShowProgress -->
@@ -478,23 +493,26 @@
     <system:String x:Key="String_Progress_FixGatewayAfterDHCPEnabled">Fix gateway after DHCP is enabled...</system:String>
     
     <!-- Validate (User Input in GUI) -->
-    <system:String x:Key="String_ValidateError_FieldEmpty">Field cannot be empty!</system:String>
-    <system:String x:Key="String_ValidateError_EnterValidMACAddress">Enter a valid MAC address like 00:F1:23:AB:F2:35!</system:String>
-    <system:String x:Key="String_ValidateError_EnterValidPort">Enter a valid port (1 - 65535)!</system:String>
-    <system:String x:Key="String_ValidateError_EnterValidIPv4Address">Enter a valid IPv4 address!</system:String>
-    <system:String x:Key="String_ValidateError_FolderDoesNotExist">Folder does not exists!</system:String>
-    <system:String x:Key="String_ValidateError_EnterValidSubnetmask">Enter a valid subnetmask (like 255.255.255.0)!</system:String>
-    <system:String x:Key="String_ValidateError_EnterValidSubnetmaskOrCIDR">Enter a valid subnetmask or CIDR (like 255.255.255.0 or 24)!</system:String>
-    <system:String x:Key="String_ValidateError_EnterValidIPScanRange">Enter a valid ip range!</system:String>
-    <system:String x:Key="String_ValidateError_FileDoesNotExist">File does not exists!</system:String>
-    <system:String x:Key="String_ValidateError_EnterValidPortOrPortRange">Enter a valid port and/or port range (1 - 65535)!</system:String>
-    <system:String x:Key="String_ValidateError_OnlyNumbersCanBeEntered">Only numbers can be entered!</system:String>
-    <system:String x:Key="String_ValidateError_EnterValidValueBetween10and100">Enter a valid value between 10 and 100!</system:String>
-    <system:String x:Key="String_ValidateError_EnterValidIPAddress">Enter a valid IP address!</system:String>
-    <system:String x:Key="String_ValidateError_EnterValidSubnet">Enter a valid subnet (like 192.168.178.133/26)</system:String>
-    <system:String x:Key="String_ValidateError_EnterValidWebsiteUri">Enter a valid website (like https://example.com/index.html)</system:String>
-    <system:String x:Key="String_ValidateError_EnterValidHosts">Enter valid hosts (multiple hosts can not end with ";")!</system:String>
-    <system:String x:Key="String_ValidateError_EnterValidNumber">Enter a valid number!</system:String>
+    <system:String x:Key="String_ValidationError_FieldEmpty">Field cannot be empty!</system:String>
+    <system:String x:Key="String_ValidationError_EnterValidMACAddress">Enter a valid MAC address like 00:F1:23:AB:F2:35!</system:String>
+    <system:String x:Key="String_ValidationError_EnterValidPort">Enter a valid port (1 - 65535)!</system:String>
+    <system:String x:Key="String_ValidationError_EnterValidIPv4Address">Enter a valid IPv4 address!</system:String>
+    <system:String x:Key="String_ValidationError_FolderDoesNotExist">Folder does not exists!</system:String>
+    <system:String x:Key="String_ValidationError_EnterValidSubnetmask">Enter a valid subnetmask (like 255.255.255.0)!</system:String>
+    <system:String x:Key="String_ValidationError_EnterValidSubnetmaskOrCIDR">Enter a valid subnetmask or CIDR (like 255.255.255.0 or 24)!</system:String>
+    <system:String x:Key="String_ValidationError_EnterValidIPScanRange">Enter a valid ip range!</system:String>
+    <system:String x:Key="String_ValidationError_FileDoesNotExist">File does not exists!</system:String>
+    <system:String x:Key="String_ValidationError_EnterValidPortOrPortRange">Enter a valid port and/or port range (1 - 65535)!</system:String>
+    <system:String x:Key="String_ValidationError_OnlyNumbersCanBeEntered">Only numbers can be entered!</system:String>
+    <system:String x:Key="String_ValidationError_EnterValidValueBetween10and100">Enter a valid value between 10 and 100!</system:String>
+    <system:String x:Key="String_ValidationError_EnterValidIPAddress">Enter a valid IP address!</system:String>
+    <system:String x:Key="String_ValidationError_EnterValidSubnet">Enter a valid subnet (like 192.168.178.133/26)</system:String>
+    <system:String x:Key="String_ValidationError_EnterValidWebsiteUri">Enter a valid website (like https://example.com/index.html)</system:String>
+    <system:String x:Key="String_ValidationError_EnterValidHosts">Enter valid hosts (multiple hosts can not end with ";")!</system:String>
+    <system:String x:Key="String_ValidationError_EnterValidNumber">Enter a valid number!</system:String>
+    <system:String x:Key="String_ValidationError_EnterOneOrMoreValidIPAddresses">Enter one or more valid IP addresses!</system:String>
+    <system:String x:Key="String_ValidationError_EnterValidOID">Enter a valid OID!</system:String>
+    <system:String x:Key="String_ValidationError_KeyMustHave8CharactersOrMore">Key must have 8 characters or more!</system:String>
     
     <!-- ApplicationView.Name -->
     <system:String x:Key="String_ApplicationName_IPScanner">IP Scanner</system:String>
@@ -529,7 +547,9 @@
     <!-- AppTheme.Name -->
     <system:String x:Key="String_AppTheme_BaseLight">Light</system:String>
     <system:String x:Key="String_AppTheme_BaseDark">Dark</system:String>
-
+    <system:String x:Key="String_AppTheme_Black">Black</system:String>
+    <system:String x:Key="String_AppTheme_White">White</system:String>
+    
     <!-- Accent.Name -->
     <system:String x:Key="String_Accent_Red">Red</system:String>
     <system:String x:Key="String_Accent_Green">Green</system:String>
@@ -554,6 +574,7 @@
     <system:String x:Key="String_Accent_Mauve">Mauve</system:String>
     <system:String x:Key="String_Accent_Taupe">Taupe</system:String>
     <system:String x:Key="String_Accent_Sienna">Sienna</system:String>
+    <system:String x:Key="String_Accent_Black">Black</system:String>
     
     <!-- IPStatus -->
     <system:String x:Key="String_IPStatus_Success">Success</system:String>

@@ -1,5 +1,5 @@
 <div align="center">  
-  <img alt="NETworkManager" src="NETworkManager.png" />
+  <img alt="NETworkManager" src="NETworkManager.svg" height="128" width="128" />
   <h1>NETworkManager</h1>  
   <p>A powerful tool for managing networks and troubleshoot network problems!</p>
   <p>   
@@ -17,9 +17,9 @@
 
 <h2>Download</h2>
 
-:package: [Version 1.4.2.0](https://github.com/BornToBeRoot/NETworkManager/releases/download/v1.4.2.0/NETworkManager_v1.4.2.0.zip)
+:package: [Version 1.5.0.0](https://github.com/BornToBeRoot/NETworkManager/releases/download/v1.5.0.0/NETworkManager_v1.5.0.0.zip)
 
-SHA256: `10FF4C0DF4812CC3B661ACC1614B3B3496298F98A9AC2F8696DCF9D2AB5C3A19`
+SHA256: `B70D60EF1DCF285F6DB190C7034E2228F6ABC6B2AF3BAE52B832082FB46681D1`
 
 The software is portable by default, simply unpack the ZIP archive and save it in a folder you have write permissions on.
 
@@ -37,6 +37,7 @@ _On Windows 10 systems, SmartScreen may prevent the execution of the_ `NETworkMa
 - Traceroute
 - DNS Lookup
 - Remote Desktop
+- SNMP - Get/Walk/Set (v1, v2c, v3)
 - Wake on LAN
 - HTTP Headers
 - Subnet-Calculator
@@ -52,7 +53,7 @@ _On Windows 10 systems, SmartScreen may prevent the execution of the_ `NETworkMa
 
 - Windows 7 or later
 - .NET-Framework 4.6
-- RDP 8.1 ([How to install RDP 8.1 on Windows 7/Server 2008 R2?](Documentation/en-US/Help/Install_RDP_8dot1_on_Windows6dot1.md))
+- RDP 8.1 ([How to install RDP 8.1 on Windows 7/Server 2008 R2?](Documentation/en-US/HowTo/Install_RDP_8dot1_on_Windows6dot1.md))
 
 <h2>Documentation</h2>
 

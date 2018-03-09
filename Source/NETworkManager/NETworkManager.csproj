@@ -55,7 +55,7 @@
     <StartupObject>NETworkManager.App</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\Images\NETworkManager.ico</ApplicationIcon>
+    <ApplicationIcon>NETworkManager.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AxMSTSCLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -68,8 +68,8 @@
     <Reference Include="Dragablz, Version=0.0.3.197, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dragablz.0.0.3.197\lib\net45\Dragablz.dll</HintPath>
     </Reference>
-    <Reference Include="MahApps.Metro, Version=1.6.0.184, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MahApps.Metro.1.6.0-alpha0184\lib\net45\MahApps.Metro.dll</HintPath>
+    <Reference Include="MahApps.Metro, Version=1.6.0.362, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.1.6.0\lib\net45\MahApps.Metro.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro.IconPacks, Version=2.0.0.31, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.IconPacks.2.0.0\lib\net46\MahApps.Metro.IconPacks.dll</HintPath>
@@ -79,8 +79,8 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
       <HintPath>obj\Debug\MSTSCLib.dll</HintPath>
     </Reference>
-    <Reference Include="Octokit, Version=0.28.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Octokit.0.28.0\lib\net45\Octokit.dll</HintPath>
+    <Reference Include="Octokit, Version=0.29.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Octokit.0.29.0\lib\net45\Octokit.dll</HintPath>
     </Reference>
     <Reference Include="SharpSnmpLib, Version=10.0.3.0, Culture=neutral, PublicKeyToken=4c00852d3788e005, processorArchitecture=MSIL">
       <HintPath>..\packages\Lextm.SharpSnmpLib.10.0.3\lib\net452\SharpSnmpLib.dll</HintPath>
@@ -184,7 +184,12 @@
     <Compile Include="3rdParty\Heijden.DNS\Response.cs" />
     <Compile Include="3rdParty\Heijden.DNS\RR.cs" />
     <Compile Include="3rdParty\Heijden.DNS\Structs.cs" />
-    <Compile Include="Controls\DragablzMainInterTabClient.cs" />
+    <Compile Include="Controls\DragablzRemoteDesktopTabHostWindow.xaml.cs">
+      <DependentUpon>DragablzRemoteDesktopTabHostWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\DragablzRemoteDesktopInterTabClient.cs" />
+    <Compile Include="Controls\DragablzPingInterTabClient.cs" />
+    <Compile Include="Controls\DragablzPingTabItem.cs" />
     <Compile Include="Controls\DragablzRemoteDesktopTabItem.cs" />
     <Compile Include="Converters\NullOrEmptyToBoolConverter.cs" />
     <Compile Include="Converters\TimestampToStringConverter.cs" />
@@ -194,6 +199,9 @@
     <Compile Include="Helpers\PowerShellHelper.cs" />
     <Compile Include="Helpers\SecureStringHelper.cs" />
     <Compile Include="Helpers\SingleInstanceHelper.cs" />
+    <Compile Include="Helpers\VisualTreeHelper.cs" />
+    <Compile Include="Models\Documentation\LibraryManager.cs" />
+    <Compile Include="Models\Documentation\LibraryInfo.cs" />
     <Compile Include="Models\Documentation\DocumentationInfo.cs" />
     <Compile Include="Models\Documentation\DocumentationManager.cs" />
     <Compile Include="Models\Network\HTTPHeadersOptions.cs" />
@@ -212,11 +220,15 @@
     <Compile Include="Models\Settings\RemoteDesktopSessionInfo.cs" />
     <Compile Include="Models\Update\UpdateAvailableArgs.cs" />
     <Compile Include="Models\Update\Updater.cs" />
+    <Compile Include="Validators\PrivacyAESValidator.cs" />
+    <Compile Include="Validators\OIDValidator.cs" />
     <Compile Include="Validators\Int32Validator.cs" />
+    <Compile Include="Validators\MultipleIPAddressesValidator.cs" />
     <Compile Include="Validators\MultipleHostsValidator.cs" />
     <Compile Include="Validators\HttpAndHttpsUriValidator.cs" />
-    <Compile Include="ViewModels\Applications\SNMPv3ViewModel.cs" />
-    <Compile Include="ViewModels\Applications\SNMPv1v2cViewModel.cs" />
+    <Compile Include="Validators\SubnetCalculatorSubnetValidator.cs" />
+    <Compile Include="ViewModels\Applications\PingHostViewModel.cs" />
+    <Compile Include="ViewModels\Applications\SNMPViewModel.cs" />
     <Compile Include="ViewModels\Applications\HTTPHeadersViewModel.cs" />
     <Compile Include="ViewModels\Applications\ARPTableViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\CredentialsMasterPasswordViewModel.cs" />
@@ -260,11 +272,8 @@
       <DependentUpon>RemoteDesktopControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\Settings\SettingsGeneralUpdateViewModel.cs" />
-    <Compile Include="Views\Applications\SNMPv3View.xaml.cs">
-      <DependentUpon>SNMPv3View.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Applications\SNMPv1v2cView.xaml.cs">
-      <DependentUpon>SNMPv1v2cView.xaml</DependentUpon>
+    <Compile Include="Views\Applications\PingHostView.xaml.cs">
+      <DependentUpon>PingHostView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Applications\SNMPView.xaml.cs">
       <DependentUpon>SNMPView.xaml</DependentUpon>
@@ -278,8 +287,8 @@
     <Compile Include="Views\Applications\SubnetCalculatorIPv4SplitterView.xaml.cs">
       <DependentUpon>SubnetCalculatorIPv4SplitterView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Applications\SubnetCalculatorView.xaml.cs">
-      <DependentUpon>SubnetCalculatorView.xaml</DependentUpon>
+    <Compile Include="Views\Applications\SubnetCalculatorHostView.xaml.cs">
+      <DependentUpon>SubnetCalculatorHostView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Applications\LookupOUILookupView.xaml.cs">
       <DependentUpon>LookupOUILookupView.xaml</DependentUpon>
@@ -290,8 +299,8 @@
     <Compile Include="Views\Applications\RemoteDesktopView.xaml.cs">
       <DependentUpon>RemoteDesktopView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\DragablzTabHostWindow.xaml.cs">
-      <DependentUpon>DragablzTabHostWindow.xaml</DependentUpon>
+    <Compile Include="Controls\DragablzPingTabHostWindow.xaml.cs">
+      <DependentUpon>DragablzPingTabHostWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialogs\CredentialDialog.xaml.cs">
       <DependentUpon>CredentialDialog.xaml</DependentUpon>
@@ -352,6 +361,10 @@
     </Compile>
     <Compile Include="WpfHelper\PasswordBoxBindingBehavior.cs" />
     <Compile Include="WpfHelper\ProtocolSettingsLayout.cs" />
+    <Page Include="Controls\DragablzRemoteDesktopTabHostWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Resources\ContextMenu\ContextMenu.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -424,11 +437,46 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Applications\SNMPv3View.xaml">
+    <None Include="Licenses\ControlsEx.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Licenses\Dragablz.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Licenses\Heijden.DNS.htm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Licenses\MahApps.Metro.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Licenses\MahApps.Metro.IconPack.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Licenses\NETworkManager.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Licenses\Octokit.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Licenses\SharpSnmpLib.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Themes\Black.Accent.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Applications\SNMPv1v2cView.xaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Themes\Black.Theme.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Themes\White.Theme.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Page Include="Views\Applications\PingHostView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -448,7 +496,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Applications\SubnetCalculatorView.xaml">
+    <Page Include="Views\Applications\SubnetCalculatorHostView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -464,7 +512,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Applications\LookupView.xaml">
+    <Page Include="Views\Applications\LookupHostView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -488,7 +536,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\DragablzTabHostWindow.xaml">
+    <Page Include="Controls\DragablzPingTabHostWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -651,7 +699,7 @@
     <Compile Include="Converters\ValidateSettingsImportConverter.cs" />
     <Compile Include="Converters\ValidateSettingsResetConverter.cs" />
     <Compile Include="Converters\ValidateSettingsExportConverter.cs" />
-    <Compile Include="Helpers\HistoryListHelper.cs" />
+    <Compile Include="Helpers\ListHelper.cs" />
     <Compile Include="Helpers\HotKeysHelper.cs" />
     <Compile Include="Models\Network\ARPTable.cs" />
     <Compile Include="Helpers\PortRangeHelper.cs" />
@@ -684,8 +732,8 @@
     <Compile Include="ViewModels\Settings\SettingsApplicationPingViewModel.cs" />
     <Compile Include="ViewModels\Settings\SettingsGeneralGeneralViewModel.cs" />
     <Compile Include="ViewModels\Settings\SettingsApplicationTracerouteViewModel.cs" />
-    <Compile Include="Views\Applications\LookupView.xaml.cs">
-      <DependentUpon>LookupView.xaml</DependentUpon>
+    <Compile Include="Views\Applications\LookupHostView.xaml.cs">
+      <DependentUpon>LookupHostView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ApplicationViewManager.cs" />
     <Compile Include="Views\ApplicationViewInfo.cs" />
@@ -913,12 +961,6 @@
     <Resource Include="Resources\Localization\Flags\en-US.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Images\NETworkManager.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Images\NETworkManager_128x128.png" />
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4.5 %28x86 and x64%29</ProductName>
@@ -949,6 +991,12 @@
     <None Include="Resources\OUI.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\NETworkManager.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="NETworkManager.ico" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -10,6 +10,8 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Data;
 using System.ComponentModel;
+using MahApps.Metro.Controls.Dialogs;
+using System.Linq;
 
 namespace NETworkManager.ViewModels.Applications
 {
@@ -17,8 +19,7 @@ namespace NETworkManager.ViewModels.Applications
     {
         #region Variables
         CancellationTokenSource cancellationTokenSource;
-
-        private bool _isLoading = true;
+        private IDialogCoordinator dialogCoordinator;
 
         private string _subnet;
         public string Subnet
@@ -34,21 +35,10 @@ namespace NETworkManager.ViewModels.Applications
             }
         }
 
-        private List<string> _subnetHistory = new List<string>();
-        public List<string> SubnetHistory
+        private ICollectionView _subnetHistoryView;
+        public ICollectionView SubnetHistoryView
         {
-            get { return _subnetHistory; }
-            set
-            {
-                if (value == _subnetHistory)
-                    return;
-
-                if (!_isLoading)
-                    SettingsManager.Current.SubnetCalculator_IPv4Splitter_SubnetHistory = value;
-
-                _subnetHistory = value;
-                OnPropertyChanged();
-            }
+            get { return _subnetHistoryView; }
         }
 
         private string _newSubnetmaskOrCIDR;
@@ -65,21 +55,10 @@ namespace NETworkManager.ViewModels.Applications
             }
         }
 
-        private List<string> _newSubnetmaskOrCIDRHistory = new List<string>();
-        public List<string> NewSubnetmaskOrCIDRHistory
+        private ICollectionView _newSubnetmaskOrCIDRHistoryView;
+        public ICollectionView NewSubnetmaskOrCIDRHistoryView
         {
-            get { return _newSubnetmaskOrCIDRHistory; }
-            set
-            {
-                if (value == _newSubnetmaskOrCIDRHistory)
-                    return;
-
-                if (!_isLoading)
-                    SettingsManager.Current.SubnetCalculator_IPv4Splitter_NewSubnetmaskOrCIDRHistory = value;
-
-                _newSubnetmaskOrCIDRHistory = value;
-                OnPropertyChanged();
-            }
+            get { return _newSubnetmaskOrCIDRHistoryView; }
         }
 
         private bool _isSplitRunning;
@@ -174,24 +153,17 @@ namespace NETworkManager.ViewModels.Applications
         #endregion
 
         #region Constructor, load settings
-        public SubnetCalculatorIPv4SplitterViewModel()
+        public SubnetCalculatorIPv4SplitterViewModel(IDialogCoordinator instance)
         {
-            LoadSettings();
+            dialogCoordinator = instance;
+
+            // Set collection view
+            _subnetHistoryView = CollectionViewSource.GetDefaultView(SettingsManager.Current.SubnetCalculator_IPv4Splitter_SubnetHistory);
+            _newSubnetmaskOrCIDRHistoryView = CollectionViewSource.GetDefaultView(SettingsManager.Current.SubnetCalculator_IPv4Splitter_NewSubnetmaskOrCIDRHistory);
 
             // Result view
             _splitResultsView = CollectionViewSource.GetDefaultView(SplitResult);
-            _splitResultsView.SortDescriptions.Add(new SortDescription("NetworkAddressInt32", ListSortDirection.Ascending));
-
-            _isLoading = false;
-        }
-
-        private void LoadSettings()
-        {
-            if (SettingsManager.Current.SubnetCalculator_IPv4Splitter_SubnetHistory != null)
-                SubnetHistory = new List<string>(SettingsManager.Current.SubnetCalculator_IPv4Splitter_SubnetHistory);
-
-            if (SettingsManager.Current.SubnetCalculator_IPv4Splitter_NewSubnetmaskOrCIDRHistory != null)
-                NewSubnetmaskOrCIDRHistory = new List<string>(SettingsManager.Current.SubnetCalculator_IPv4Splitter_NewSubnetmaskOrCIDRHistory);
+            _splitResultsView.SortDescriptions.Add(new SortDescription(nameof(SubnetInfo.NetworkAddressInt32), ListSortDirection.Ascending));
         }
         #endregion
 
@@ -299,21 +271,37 @@ namespace NETworkManager.ViewModels.Applications
             SplitResult.Clear();
 
             string[] subnetSplit = Subnet.Trim().Split('/');
+            string newSubnetmaskOrCidr = NewSubnetmaskOrCIDR.TrimStart('/');
 
-            string subnetmask = subnetSplit[1];
+            // Validate the user input and display warning
+            double cidr = subnetSplit[1].Length < 3 ? double.Parse(subnetSplit[1]) : SubnetmaskHelper.ConvertSubnetmaskToCidr(subnetSplit[1]);
+            double newCidr = newSubnetmaskOrCidr.Length < 3 ? double.Parse(newSubnetmaskOrCidr) : SubnetmaskHelper.ConvertSubnetmaskToCidr(newSubnetmaskOrCidr);
+
+            if (65535 < (Math.Pow(2, (32 - cidr)) / Math.Pow(2, (32 - newCidr))))
+            {
+                MetroDialogSettings settings = AppearanceManager.MetroDialog;
+
+                settings.AffirmativeButtonText = Application.Current.Resources["String_Button_Continue"] as string;
+                settings.NegativeButtonText = Application.Current.Resources["String_Button_Cancel"] as string;
+
+                settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
+
+                if (await dialogCoordinator.ShowMessageAsync(this, Application.Current.Resources["String_Header_AreYouSure"] as string, Application.Current.Resources["String_TheProcessCanTakeUpSomeTimeAndResources"] as string, MessageDialogStyle.AffirmativeAndNegative, settings) != MessageDialogResult.Affirmative)
+                {
+                    CancelSplit = false;
+                    IsSplitRunning = false;
+
+                    return;
+                }
+            }
 
             // Convert CIDR to subnetmask
-            if (subnetmask.Length < 3)
-                subnetmask = Subnetmask.GetFromCidr(int.Parse(subnetSplit[1])).Subnetmask;
-
-            string newSubnetmask = NewSubnetmaskOrCIDR.TrimStart('/');
-
-            if (newSubnetmask.Length < 3)
-                newSubnetmask = Subnetmask.GetFromCidr(int.Parse(newSubnetmask)).Subnetmask;
+            string subnetmask = Subnetmask.GetFromCidr((int)cidr).Subnetmask;
+            string newSubnetmask = Subnetmask.GetFromCidr((int)newCidr).Subnetmask;
 
             // Add history
-            SubnetHistory = new List<string>(HistoryListHelper.Modify(SubnetHistory, Subnet, SettingsManager.Current.General_HistoryListEntries));
-            NewSubnetmaskOrCIDRHistory = new List<string>(HistoryListHelper.Modify(NewSubnetmaskOrCIDRHistory, NewSubnetmaskOrCIDR, SettingsManager.Current.General_HistoryListEntries));
+            AddSubnetToHistory(Subnet);
+            AddNewSubnetmaskOrCIDRToHistory(NewSubnetmaskOrCIDR);
 
             cancellationTokenSource = new CancellationTokenSource();
 
@@ -336,6 +324,32 @@ namespace NETworkManager.ViewModels.Applications
         {
             CancelSplit = true;
             cancellationTokenSource.Cancel();
+        }
+
+        private void AddSubnetToHistory(string subnet)
+        {
+            // Create the new list
+            List<string> list = ListHelper.Modify(SettingsManager.Current.SubnetCalculator_IPv4Splitter_SubnetHistory.ToList(), subnet, SettingsManager.Current.General_HistoryListEntries);
+
+            // Clear the old items
+            SettingsManager.Current.SubnetCalculator_IPv4Splitter_SubnetHistory.Clear();
+            OnPropertyChanged(nameof(Subnet)); // Raise property changed again, after the collection has been cleared
+
+            // Fill with the new items
+            list.ForEach(x => SettingsManager.Current.SubnetCalculator_IPv4Splitter_SubnetHistory.Add(x));
+        }
+
+        private void AddNewSubnetmaskOrCIDRToHistory(string newSubnetmaskOrCIDR)
+        {
+            // Create the new list
+            List<string> list = ListHelper.Modify(SettingsManager.Current.SubnetCalculator_IPv4Splitter_NewSubnetmaskOrCIDRHistory.ToList(), newSubnetmaskOrCIDR, SettingsManager.Current.General_HistoryListEntries);
+
+            // Clear the old items
+            SettingsManager.Current.SubnetCalculator_IPv4Splitter_NewSubnetmaskOrCIDRHistory.Clear();
+            OnPropertyChanged(nameof(NewSubnetmaskOrCIDR)); // Raise property changed again, after the collection has been cleared
+
+            // Fill with the new items
+            list.ForEach(x => SettingsManager.Current.SubnetCalculator_IPv4Splitter_NewSubnetmaskOrCIDRHistory.Add(x));
         }
 
         public void OnShutdown()
